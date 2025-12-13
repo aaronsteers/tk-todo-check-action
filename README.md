@@ -132,7 +132,7 @@ When using the slash command dispatch workflow here in this repo, the following 
 
 ## Example Executions
 
-For execution examples, check the [pinned issues](https://github.com/aaronsteers/tk-todo-check-action/issues) here in this repo.
+For execution examples, check the [issues](https://github.com/aaronsteers/tk-todo-check-action/issues) in this repo.
 
 ## Example Workflow [Slash Commands]
 
