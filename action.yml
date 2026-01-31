@@ -1,6 +1,6 @@
 # IGNORE:TK - This action checks for TK-TODO markers
 name: TK-TODO Check Action
-description: "Checks for TK-TODO markers that must be resolved before merge."
+description: "Set blocking TODO markers (`TK-TODO`) that must be resolved before merge."
 branding:
   icon: bookmark
   color: yellow
