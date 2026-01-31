@@ -21,26 +21,5 @@ jobs:
       - name: Create or update draft release
         uses: aaronsteers/semantic-pr-release-drafter@v0
         id: release-drafter
-        with:
-          categories: |
-            - title: '🚀 New Features'
-              commit-types:
-                - 'feat'
-              display-order: 100
-            - title: '🐛 Bug Fixes'
-              commit-types:
-                - 'fix'
-              display-order: 101
-            - title: '⚙️ Under the Hood'
-              commit-types:
-                - 'chore'
-                - 'ci'
-                - 'build'
-                - 'refactor'
-                - 'test'
-                - 'perf'
-                - 'docs'
-              collapse-after: 3
-              display-order: 999
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
