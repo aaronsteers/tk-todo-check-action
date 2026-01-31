@@ -21,9 +21,9 @@ jobs:
         uses: ./
         with:
           fail-on-found: "false"
+          exclude-patterns: "README.md action.yml"
 
       - name: Check test results
         run: |
           echo "Test completed successfully"
           echo "Found count: ${{ steps.todo-check.outputs.found-count }}"
-          echo "Found markers: ${{ steps.todo-check.outputs.found-markers }}"

@@ -1,3 +1,4 @@
+<!-- IGNORE:TK - This file documents the TK-TODO check action -->
 # TK-TODO Check Action
 
 A reusable GitHub Action that checks for `TK-TODO` markers in your codebase. These markers indicate temporary code or placeholders that must be resolved before merging.
@@ -13,6 +14,7 @@ A reusable GitHub Action that checks for `TK-TODO` markers in your codebase. The
 
 ### Basic Example
 
+<!-- IGNORE:TK - example code -->
 ```yaml
 name: TK-TODO Check
 
@@ -38,6 +40,7 @@ jobs:
 
 ### With Custom Options
 
+<!-- IGNORE:TK - example code -->
 ```yaml
 - name: Check for TK-TODO markers
   uses: aaronsteers/tk-todo-check-action@v1
@@ -47,6 +50,7 @@ jobs:
 
 ### Using Outputs
 
+<!-- IGNORE:TK - example code -->
 ```yaml
 - name: Check for TK-TODO markers
   id: todo-check
@@ -63,12 +67,15 @@ jobs:
 
 ## Inputs
 
+<!-- IGNORE:TK - documentation table -->
 | Name | Description | Required | Default |
 |------|-------------|----------|---------|
 | `fail-on-found` | Whether to fail the action if TK-TODO markers are found | false | `true` |
+| `exclude-patterns` | Glob patterns to exclude from the check (space-separated) | false | `""` |
 
 ## Outputs
 
+<!-- IGNORE:TK - documentation table -->
 | Name | Description |
 |------|-------------|
 | `found-count` | Number of TK-TODO markers found |
@@ -78,10 +85,12 @@ jobs:
 
 To suppress a `TK-TODO` marker (for example, in documentation or test files), add `IGNORE:TK` (case-insensitive) on the same line:
 
+<!-- IGNORE:TK - example code -->
 ```python
 # TK-TODO: This needs to be fixed  # IGNORE:TK - documented in issue #123
 ```
 
+<!-- IGNORE:TK - example code -->
 ```yaml
 name: TK-TODO Check  # IGNORE:TK - this workflow checks for TK-TODO markers
 ```

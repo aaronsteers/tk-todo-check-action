@@ -1,3 +1,4 @@
+# IGNORE:TK - This action checks for TK-TODO markers
 name: TK-TODO Check Action
 description: |
   Checks for TK-TODO markers in your codebase that must be resolved before merge.
@@ -8,15 +9,22 @@ branding:
 
 inputs:
   fail-on-found:
+    # IGNORE:TK - documentation
     description: "Whether to fail the action if TK-TODO markers are found (default: true)"
     required: false
     default: "true"
+  exclude-patterns:
+    description: "Glob patterns to exclude from the check (space-separated, e.g., '*.md docs/*')"
+    required: false
+    default: ""
 
 outputs:
   found-count:
+    # IGNORE:TK - documentation
     description: "Number of TK-TODO markers found"
     value: ${{ steps.check.outputs.found-count }}
   found-markers:
+    # IGNORE:TK - documentation
     description: "List of found TK-TODO markers (file:line format)"
     value: ${{ steps.check.outputs.found-markers }}
 
@@ -32,19 +40,28 @@ runs:
 
         echo "Checking for TK-TODO markers..."  # IGNORE:TK
 
+        # Build exclude arguments for grep
+        EXCLUDE_ARGS=""
+        if [ -n "${{ inputs.exclude-patterns }}" ]; then
+          for pattern in ${{ inputs.exclude-patterns }}; do
+            EXCLUDE_ARGS="$EXCLUDE_ARGS --exclude=$pattern"
+          done
+          echo "Excluding patterns: ${{ inputs.exclude-patterns }}"
+        fi
+
         # Use git ls-files to only check tracked files (excludes gitignored files)
         # grep -i for case-insensitive matching
         # grep -v for excluding lines with IGNORE:TK
         # grep -n for line numbers
 
-        FOUND_TODOS=$(git ls-files | xargs grep -i -n "TK-TODO" 2>/dev/null | grep -i -v "IGNORE:TK" || true)  # IGNORE:TK
+        FOUND_TODOS=$(git ls-files | xargs grep -i -n $EXCLUDE_ARGS "TK-TODO" 2>/dev/null | grep -i -v "IGNORE:TK" || true)  # IGNORE:TK
 
         if [ -n "$FOUND_TODOS" ]; then
           # Count the number of markers found
           FOUND_COUNT=$(echo "$FOUND_TODOS" | wc -l | tr -d ' ')
           echo "found-count=$FOUND_COUNT" >> $GITHUB_OUTPUT
 
-          # Save markers to output (base64 encoded to handle special characters)
+          # Save markers to output
           echo "found-markers<<EOF" >> $GITHUB_OUTPUT
           echo "$FOUND_TODOS" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
