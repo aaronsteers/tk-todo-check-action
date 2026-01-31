@@ -2,8 +2,8 @@
 name: TK-TODO Check Action
 description: "Checks for TK-TODO markers that must be resolved before merge."
 branding:
-  icon: check-circle
-  color: green
+  icon: bookmark
+  color: yellow
 
 inputs:
   fail-on-found:
