@@ -3,6 +3,23 @@
 
 A reusable GitHub Action that checks for `TK-TODO` markers in your codebase. These markers indicate temporary code or placeholders that must be resolved before merging.
 
+## Why TK-TODO?
+
+The "TK" in TK-TODO comes from the publishing industry term ["to come" (TK)](https://en.wikipedia.org/wiki/To_come_(publishing)), used to mark where additional material will be added before publication. Since very few English words contain the letter combination "TK", it's easily searchable and visually distinctive in running text.
+
+Traditional `TODO` comments in code have a fundamental ambiguity problem: there's no clear way to distinguish between a TODO that should block a PR from merging versus one that's simply a note for future developers. This leads to TODOs that were meant to be temporary slipping through code review and living in the codebase forever.
+
+The `TK-TODO` convention solves this by providing an explicit, unambiguous signal. A TK-TODO doesn't block anything unless the PR author intentionally adds one, indicating "this cannot be merged yet." It's a deliberate choice to mark something that maybe can't be resolved immediately but absolutely should not slip through and be merged.
+
+### Example Use Cases
+
+- **Unreleased dependencies**: You're waiting for a library update to be published before your code can work in production
+- **Documentation requirements**: Code that needs documentation written before it can be merged
+- **Subject matter expert review**: Areas where you need confirmation from a domain expert before proceeding
+- **Placeholder implementations**: Temporary code that must be replaced with a real implementation
+- **Configuration values**: Hardcoded values that need to be moved to environment variables or config files
+- **Test coverage**: Code paths that need tests written before the PR is complete
+
 ## Features
 
 - Scans all tracked files for `TK-TODO` markers (case-insensitive)
