@@ -1,179 +1,120 @@
+<!-- IGNORE:TK - This file documents the TK-TODO check action -->
 # TK-TODO Check Action
 
-A reusable GitHub action which calls out to Devin.ai, creating a new Devin session with a given prompt or playbook. Designed to be used directly, or in slash commands. When invoked via slash commands, Devin can:
+A reusable GitHub Action that checks for `TK-TODO` markers in your codebase. These markers indicate temporary code or placeholders that must be resolved before merging.
 
-- post a response back as a comment
-- update the current PR
-- open an new PR if needed
+## Why TK-TODO?
+
+The "TK" in TK-TODO comes from the publishing industry term ["to come" (TK)](https://en.wikipedia.org/wiki/To_come_(publishing)), used to mark where additional material will be added before publication. Since very few English words contain the letter combination "TK", it's easily searchable and visually distinctive in running text.
+
+Traditional `TODO` comments in code have a fundamental ambiguity problem: there's no clear way to distinguish between a TODO that should block a PR from merging versus one that's simply a note for future developers. This leads to TODOs that were meant to be temporary slipping through code review and living in the codebase forever.
+
+The `TK-TODO` convention solves this by providing an explicit, unambiguous signal. A TK-TODO doesn't block anything unless the PR author intentionally adds one, indicating "this cannot be merged yet." It's a deliberate choice to mark something that maybe can't be resolved immediately but absolutely should not slip through and be merged.
+
+### Example Use Cases
+
+- **Unreleased dependencies**: You're waiting for a library update to be published before your code can work in production
+- **Documentation requirements**: Code that needs documentation written before it can be merged
+- **Subject matter expert review**: Areas where you need confirmation from a domain expert before proceeding
+- **Placeholder implementations**: Temporary code that must be replaced with a real implementation
+- **Configuration values**: Hardcoded values that need to be moved to environment variables or config files
+- **Test coverage**: Code paths that need tests written before the PR is complete
 
 ## Features
 
-- ✅ Creates Devin.ai sessions with custom prompts
-- ✅ Supports triggering via slash commands in PR and issue comments
-- ✅ Automatically gathers context from GitHub issues and comments
-- ✅ Supports playbook macro integration
-- ✅ Posts status updates and session links as comments
-- ✅ Flexible input handling - use any combination of inputs
-
-## Inputs
-
-| Name           | Description                                                                 | Required | Default  |
-|----------------|-----------------------------------------------------------------------------|----------|----------|
-| `comment-id`   | Comment ID for context and reply chaining                                  | false    |          |
-| `issue-number` | Issue number for context gathering                                          | false    |          |
-| `playbook-macro` | Playbook macro for structured workflows - should start with '!' (e.g., !my_playbook) | false    |          |
-| `prompt-text`  | Additional custom prompt text                                               | false    |          |
-| `devin-token`  | Devin API Token (required for authentication)                              | true     |          |
-| `github-token` | GitHub Token (required for posting comments and accessing repo context)    | false    |          |
-| `start-message`| Custom message for the start comment                                       | false    | 🤖 **Starting Devin AI session...** |
-| `tags`         | Additional tags to apply to the Devin session (supports CSV or line-delimited format). Automatic tags are always added: `gh-actions-trigger` and `playbook-{macro-name}` if playbook-macro is provided | false    |          |
-
-## Session Tagging
-
-This action automatically adds tags to Devin sessions for better monitoring and searching:
-
-### Automatic Tags
-
-- **`gh-actions-trigger`** - Always added to identify sessions triggered from GitHub Actions
-- **`playbook-{macro-name}`** - Added when `playbook-macro` is provided (e.g., `playbook-issue-ask` for `!issue_ask`)
-
-### Additional Tags
-
-You can provide additional tags using the `tags` input parameter, which supports both formats:
-
-**CSV format:**
-
-```yaml
-tags: 'priority-high,bug-fix,frontend'
-```
-
-**Line-delimited format:**
-
-```yaml
-tags: |
-  priority-high
-  bug-fix
-  frontend
-```
-
-**Mixed format (CSV per line):**
-
-```yaml
-tags: |
-  priority-high,urgent
-  bug-fix,frontend
-  team-alpha
-```
+- Scans all tracked files for `TK-TODO` markers (case-insensitive)
+- Supports suppression via `IGNORE:TK` on the same line
+- Outputs count and list of found markers
+- Configurable failure behavior
 
 ## Usage
 
 ### Basic Example
 
+<!-- IGNORE:TK - example code -->
 ```yaml
-- name: Create Devin Session
-  uses: aaronsteers/tk-todo-check-action@v1
-  with:
-    prompt-text: "Please review this code and suggest improvements"
-    devin-token: ${{ secrets.DEVIN_TOKEN }}
-    github-token: ${{ secrets.GITHUB_TOKEN }}
-    tags: 'code-review,improvement'
-```
-
-### Slash Command Example
-
-This action is designed to work with slash commands in issue and PR comments. The action will automatically gather context from the comment and/or issue.
-
-```yaml
-- name: Run Devin from Comment
-  uses: aaronsteers/tk-todo-check-action@v1
-  with:
-    comment-id: ${{ github.event.comment.id }}
-    issue-number: ${{ github.event.issue.number }}
-    devin-token: ${{ secrets.DEVIN_TOKEN }}
-    github-token: ${{ secrets.GITHUB_TOKEN }}
-```
-
-### With Playbook Macro Integration
-
-```yaml
-- name: Run Devin with Playbook Macro
-  uses: aaronsteers/tk-todo-check-action@v1
-  with:
-    playbook-macro: "!fix-ci-failures"
-    issue-number: ${{ github.event.issue.number }}
-    prompt-text: "Additional context about the specific failure"
-    devin-token: ${{ secrets.DEVIN_TOKEN }}
-    github-token: ${{ secrets.GITHUB_TOKEN }}
-    tags: |
-      ci-failure
-      urgent
-```
-
-**Tags applied:** `gh-actions-trigger`, `playbook-fix-ci-failures`, `ci-failure`, `urgent`
-
-## Context Gathering
-
-The action intelligently builds prompts by combining available context:
-
-1. **Comment Context**: If `comment-id` is provided, includes the comment body and author
-2. **Issue Context**: If `issue-number` is provided, includes issue title, description, and author  
-3. **Playbook Macro Reference**: If `playbook-macro` is provided, instructs Devin to use the specified playbook macro
-4. **Custom Prompt**: If `prompt-text` is provided, includes additional custom instructions
-
-All provided inputs are concatenated to create a comprehensive prompt for Devin.
-
-## Available Slash Commands
-
-When using the slash command dispatch workflow here in this repo, the following commands are available:
-
-- `/devin [prompt]` - Creates a general Devin session with optional custom prompt
-- `/ai-fix` - Creates a Devin session focused on analyzing and fixing issues
-- `/ai-ask` - Creates a Devin session focused on providing help and guidance
-
-## Example Executions
-
-For execution examples, check the [issues](https://github.com/aaronsteers/tk-todo-check-action/issues) in this repo.
-
-## Example Workflow [Slash Commands]
-
-`.github/workflows/ai-help-command.yml`
-
-```yml
-name: AI Help Command
+name: TK-TODO Check
 
 on:
-  repository_dispatch:
-    types: [ai-help-command]
-  workflow_dispatch:
-    inputs:
-      issue-number:
-        description: 'Issue number for context'
-        required: true
-        type: string
-      comment-id:
-        description: 'Comment ID that triggered the command (optional)'
-        required: false
-        type: string
+  push:
+    branches:
+      - main
+  pull_request: {}
 
 permissions:
   contents: read
-  issues: write
-  pull-requests: read
 
 jobs:
-  ai-repro:
+  tk-todo-check:
     runs-on: ubuntu-latest
     steps:
-      - name: Run AI Help
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for TK-TODO markers
         uses: aaronsteers/tk-todo-check-action@v1
-        with:
-          comment-id: ${{ github.event.client_payload.slash_command.args.named.comment-id || inputs.comment-id }}
-          issue-number: ${{ github.event.client_payload.slash_command.args.named.issue || inputs.issue-number }}
-          playbook-macro: '!issue_help'
-          devin-token: ${{ secrets.DEVIN_AI_API_KEY }}
-          github-token: ${{ secrets.MY_COMMENTS_PAT }}
-          start-message: '🤖 **AI Help session starting...**'
 ```
+
+### With Custom Options
+
+<!-- IGNORE:TK - example code -->
+```yaml
+- name: Check for TK-TODO markers
+  uses: aaronsteers/tk-todo-check-action@v1
+  with:
+    fail-on-found: "false"  # Don't fail, just report
+```
+
+### Using Outputs
+
+<!-- IGNORE:TK - example code -->
+```yaml
+- name: Check for TK-TODO markers
+  id: todo-check
+  uses: aaronsteers/tk-todo-check-action@v1
+  with:
+    fail-on-found: "false"
+
+- name: Report results
+  run: |
+    echo "Found ${{ steps.todo-check.outputs.found-count }} TK-TODO markers"
+    echo "Markers:"
+    echo "${{ steps.todo-check.outputs.found-markers }}"
+```
+
+## Inputs
+
+<!-- IGNORE:TK - documentation table -->
+| Name | Description | Required | Default |
+|------|-------------|----------|---------|
+| `fail-on-found` | Whether to fail the action if TK-TODO markers are found | false | `true` |
+| `exclude-patterns` | Glob patterns to exclude from the check (space-separated) | false | `""` |
+
+## Outputs
+
+<!-- IGNORE:TK - documentation table -->
+| Name | Description |
+|------|-------------|
+| `found-count` | Number of TK-TODO markers found |
+| `found-markers` | List of found TK-TODO markers (file:line format) |
+
+## Suppressing Markers
+
+To suppress a `TK-TODO` marker (for example, in documentation or test files), add `IGNORE:TK` (case-insensitive) on the same line:
+
+<!-- IGNORE:TK - example code -->
+```python
+# TK-TODO: This needs to be fixed  # IGNORE:TK - documented in issue #123
+```
+
+<!-- IGNORE:TK - example code -->
+```yaml
+name: TK-TODO Check  # IGNORE:TK - this workflow checks for TK-TODO markers
+```
+
+## How It Works
+
+The action uses `git ls-files` to scan only tracked files (respecting `.gitignore`), then searches for `TK-TODO` markers using grep. Lines containing `IGNORE:TK` are excluded from the results.
 
 ## License
 
