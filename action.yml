@@ -41,20 +41,23 @@ runs:
         echo "Checking for TK-TODO markers..."  # IGNORE:TK
 
         # Build exclude arguments for grep
+        # Use set -f to disable glob expansion so patterns like *.md are passed literally to grep
         EXCLUDE_ARGS=""
         if [ -n "${{ inputs.exclude-patterns }}" ]; then
+          set -f  # Disable glob expansion
           for pattern in ${{ inputs.exclude-patterns }}; do
             EXCLUDE_ARGS="$EXCLUDE_ARGS --exclude=$pattern"
           done
+          set +f  # Re-enable glob expansion
           echo "Excluding patterns: ${{ inputs.exclude-patterns }}"
         fi
 
-        # Use git ls-files to only check tracked files (excludes gitignored files)
+        # Use git ls-files -z with xargs -0 to handle filenames with spaces
         # grep -i for case-insensitive matching
         # grep -v for excluding lines with IGNORE:TK
         # grep -n for line numbers
 
-        FOUND_TODOS=$(git ls-files | xargs grep -i -n $EXCLUDE_ARGS "TK-TODO" 2>/dev/null | grep -i -v "IGNORE:TK" || true)  # IGNORE:TK
+        FOUND_TODOS=$(git ls-files -z | xargs -0 grep -i -n $EXCLUDE_ARGS "TK-TODO" 2>/dev/null | grep -i -v "IGNORE:TK" || true)  # IGNORE:TK
 
         if [ -n "$FOUND_TODOS" ]; then
           # Count the number of markers found
