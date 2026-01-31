@@ -16,16 +16,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Test Action with minimal inputs
-        id: test-minimal
+      - name: Test TK-TODO Check Action  # IGNORE:TK
+        id: todo-check
         uses: ./
         with:
-          prompt-text: "This is a test of the TK-TODO Check action"
-          devin-token: "test-token-placeholder"
-        continue-on-error: true
+          fail-on-found: "false"
 
       - name: Check test results
         run: |
-          echo "Test completed with exit code: ${{ steps.test-minimal.outcome }}"
-          # In a real test, we would validate the outputs
-          # For now, we just ensure the action doesn't crash on basic input validation
+          echo "Test completed successfully"
+          echo "Found count: ${{ steps.todo-check.outputs.found-count }}"
+          echo "Found markers: ${{ steps.todo-check.outputs.found-markers }}"
