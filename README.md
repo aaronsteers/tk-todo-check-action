@@ -52,7 +52,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Check for TK-TODO markers
-        uses: aaronsteers/tk-todo-check-action@v1
+        uses: aaronsteers/tk-todo-check-action@v1.0.0
 ```
 
 ### With Custom Options
@@ -60,7 +60,7 @@ jobs:
 <!-- IGNORE:TK - example code -->
 ```yaml
 - name: Check for TK-TODO markers
-  uses: aaronsteers/tk-todo-check-action@v1
+  uses: aaronsteers/tk-todo-check-action@v1.0.0
   with:
     fail-on-found: "false"  # Don't fail, just report
 ```
@@ -71,7 +71,7 @@ jobs:
 ```yaml
 - name: Check for TK-TODO markers
   id: todo-check
-  uses: aaronsteers/tk-todo-check-action@v1
+  uses: aaronsteers/tk-todo-check-action@v1.0.0
   with:
     fail-on-found: "false"
 
