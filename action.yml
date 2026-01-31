@@ -1,11 +1,9 @@
 # IGNORE:TK - This action checks for TK-TODO markers
 name: TK-TODO Check Action
-description: |
-  Checks for TK-TODO markers in your codebase that must be resolved before merge.
-  Markers can be suppressed by adding 'IGNORE:TK' (case-insensitive) on the same line.
+description: "Set blocking TODO markers (`TK-TODO`) that must be resolved before merge."
 branding:
-  icon: check-circle
-  color: green
+  icon: bookmark
+  color: yellow
 
 inputs:
   fail-on-found:
